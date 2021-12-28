@@ -30,7 +30,7 @@
 static int
 ngx_ssl_ja3_is_ext_greased(int id)
 {
-    return (id & 0x0f == 0x0a) && (id & 0xff == ((id & ~0xff) >> 8));
+    return ((id & 0x0f) == 0x0a) && ((id & 0xff) == ((id & ~0xff) >> 8));
 }
 
 
