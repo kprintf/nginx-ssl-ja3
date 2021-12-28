@@ -1,7 +1,7 @@
 diff -r d964b0aee8e7 src/event/ngx_event_openssl.c
 --- a/src/event/ngx_event_openssl.c	Thu May 23 16:49:22 2019 +0300
 +++ b/src/event/ngx_event_openssl.c	Sat Jun 01 14:53:52 2019 +0000
-@@ -1588,6 +1588,88 @@
+@@ -1588,6 +1588,89 @@
      return NGX_OK;
  }
  
