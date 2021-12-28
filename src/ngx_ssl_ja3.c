@@ -27,35 +27,10 @@
 #include "ngx_ssl_ja3.h"
 #include <ngx_md5.h>
 
-static const unsigned short GREASE[] = {
-    0x0a0a,
-    0x1a1a,
-    0x2a2a,
-    0x3a3a,
-    0x4a4a,
-    0x5a5a,
-    0x6a6a,
-    0x7a7a,
-    0x8a8a,
-    0x9a9a,
-    0xaaaa,
-    0xbaba,
-    0xcaca,
-    0xdada,
-    0xeaea,
-    0xfafa,
-};
-
-
 static int
 ngx_ssl_ja3_is_ext_greased(int id)
 {
-    for (size_t i = 0; i < (sizeof(GREASE) / sizeof(GREASE[0])); ++i) {
-        if (id == GREASE[i]) {
-            return 1;
-        }
-    }
-    return 0;
+    return (id & 0x0f == 0x0a) && (id & 0xff == ((id & 0xff00) >> 8));
 }
 
 
