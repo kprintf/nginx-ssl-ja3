@@ -1,7 +1,7 @@
 diff -r d964b0aee8e7 src/event/ngx_event_openssl.c
 --- a/src/event/ngx_event_openssl.c	Thu May 23 16:49:22 2019 +0300
 +++ b/src/event/ngx_event_openssl.c	Sat Jun 01 14:53:52 2019 +0000
-@@ -1588,6 +1588,99 @@
+@@ -1588,6 +1588,88 @@
      return NGX_OK;
  }
  
@@ -22,36 +22,26 @@ diff -r d964b0aee8e7 src/event/ngx_event_openssl.c
 +    }
 +    s = c->ssl->connection;
 +
-+    /* Somewhy callback is called twice (or more?)
-+       Some data on non-first calls is no more accessible
-+       Therefore check every _sz if it was already calculated */
-+
 +    /* Cipher suites */
-+    if (!c->ssl->ciphers_sz) {
-+        if ((c->ssl->ciphers_sz = SSL_client_hello_get0_ciphers(s, &ciphers_out)) && ciphers_out) {
-+            c->ssl->ciphers = ngx_pnalloc(c->pool, c->ssl->ciphers_sz);
-+            ngx_memcpy(c->ssl->ciphers, ciphers_out, c->ssl->ciphers_sz);
-+            c->ssl->ciphers_sz /= 2;
-+        }
++    if ((c->ssl->ciphers_sz = SSL_client_hello_get0_ciphers(s, &ciphers_out)) && ciphers_out) {
++        c->ssl->ciphers = ngx_pnalloc(c->pool, c->ssl->ciphers_sz);
++        ngx_memcpy(c->ssl->ciphers, ciphers_out, c->ssl->ciphers_sz);
++        c->ssl->ciphers_sz /= 2;
 +    }
 +
 +    /* Elliptic curve points */
-+    if (!c->ssl->curves_sz) {
-+        if (SSL_client_hello_get0_ext(s, TLSEXT_TYPE_elliptic_curves, (const unsigned char**)&curves_out, &c->ssl->curves_sz)) {
-+            c->ssl->curves = ngx_pnalloc(c->pool, c->ssl->curves_sz);
-+            c->ssl->curves_sz /= 2;
-+            for (i = 1; i < c->ssl->curves_sz; ++i)
-+                c->ssl->curves[i-1] = ntohs(curves_out[i]);
-+            c->ssl->curves_sz--;
-+        }
++    if (SSL_client_hello_get0_ext(s, TLSEXT_TYPE_elliptic_curves, (const unsigned char**)&curves_out, &c->ssl->curves_sz)) {
++        c->ssl->curves = ngx_pnalloc(c->pool, c->ssl->curves_sz);
++        c->ssl->curves_sz /= 2;
++        for (i = 1; i < c->ssl->curves_sz; ++i)
++            c->ssl->curves[i-1] = ntohs(curves_out[i]);
++        c->ssl->curves_sz--;
 +    }
 +
 +    /* Elliptic curve point formats */
-+    if (!c->ssl->point_formats_sz) {
-+        if (SSL_client_hello_get0_ext(s, TLSEXT_TYPE_ec_point_formats, (const unsigned char**) &point_formats_out, &c->ssl->point_formats_sz) && c->ssl->point_formats_sz > 1) {
-+            c->ssl->point_formats = ngx_pnalloc(c->pool, --c->ssl->point_formats_sz);
-+            ngx_memcpy(c->ssl->point_formats, point_formats_out+1, c->ssl->point_formats_sz);
-+        }
++    if (SSL_client_hello_get0_ext(s, TLSEXT_TYPE_ec_point_formats, (const unsigned char**) &point_formats_out, &c->ssl->point_formats_sz) && c->ssl->point_formats_sz > 1) {
++        c->ssl->point_formats = ngx_pnalloc(c->pool, --c->ssl->point_formats_sz);
++        ngx_memcpy(c->ssl->point_formats, point_formats_out+1, c->ssl->point_formats_sz);
 +    }
 +}
 +
